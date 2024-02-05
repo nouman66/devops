@@ -10,17 +10,56 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
-#test
+        node-version: [15.x] # Adjusted to use Node.js version 15.x
+
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+        # It's a good practice to specify the npm version if needed
+        # However, npm is typically bundled with Node.js, so specifying Node.js version should suffice
     - run: npm install
       working-directory: ./codebase/rdicidr-0.1.0
     - run: npm run lint
+      working-directory: ./codebase/rdicidr-0.1.0
     - run: npm run prettier
+      working-directory: ./codebase/rdicidr-0.1.0
     - run: CI=true npm run test
+      working-directory: ./codebase/rdicidr-0.1.0
     - run: npm run build
+      working-directory: ./codebase/rdicidr-0.1.0
+
+
+# name: Node.js CI
+
+# on:
+#   pull_request:
+#     branches: [ main ]
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     strategy:
+#       matrix:
+#         node-version: [16.x]
+# #test
+#     steps:
+#     - uses: actions/checkout@v3
+#     - name: Use Node.js ${{ matrix.node-version }}
+#       uses: actions/setup-node@v3
+#       with:
+#         node-version: ${{ matrix.node-version }}
+#     - run: npm install
+#       working-directory: ./codebase/rdicidr-0.1.0
+#     - run: npm run lint
+#     - run: npm run prettier
+#     - run: CI=true npm run test
+#     - run: npm run build
+
+#     - name: Use Node.js 15.x
+#     uses: actions/setup-node@v3
+#     with:
+#       node-version: '15.x'
