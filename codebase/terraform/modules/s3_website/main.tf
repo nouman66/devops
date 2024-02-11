@@ -63,4 +63,3 @@ resource "aws_s3_object" "website_files" {
   source   = "${var.website_content_directory}/${each.value}"
   etag     = filemd5("${var.website_content_directory}/${each.value}")
 }
-
