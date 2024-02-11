@@ -2,7 +2,7 @@ resource "aws_s3_bucket" "bucket" {
   bucket = var.bucket_name
 }
 
-resource "aws_s3_bucket_public_access_block" "block" {
+resource "aws_s3_bucket_public_access_block" "public_access_block" {
   bucket = aws_s3_bucket.bucket.id
 
   block_public_acls       = false
