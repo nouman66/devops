@@ -1,14 +1,18 @@
 resource "aws_s3_bucket" "bucket" {
   bucket = var.bucket_name
+}
+
+resource "aws_s3_bucket_policy" "bucket_policy" {
+  bucket = aws_s3_bucket.bucket.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
-        Action    = ["s3:GetObject"]
-        Effect    = "Allow"
-        Principal = "*"
-        Resource  = ["arn:aws:s3:::${var.bucket_name}/*"]
+        Action    = "s3:GetObject",
+        Effect    = "Allow",
+        Principal = "*",
+        Resource  = "arn:aws:s3:::${var.bucket_name}/*"
       },
     ]
   })
