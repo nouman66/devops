@@ -71,6 +71,7 @@ jobs:
       # working-directory: ./codebase/terraform
 
     - name: Terraform Apply
+      run: terraform force-unlock ed021b13-e5cd-908c-71a6-31ec4df66679
       run: terraform apply -var="website_content_directory=${{ github.workspace }}/codebase/rdicidr-0.1.0/build" -var="aws_region=us-east-1"
       working-directory: ./codebase/terraform
       # env:
