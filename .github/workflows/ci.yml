@@ -59,8 +59,12 @@ jobs:
       # run: terraform init -backend-config="bucket=my-terraform-state-bucket" -backend-config="region=${{ secrets.AWS_REGION }}" -backend-config="dynamodb_table=my-terraform-lock-table"
       working-directory: ./codebase/terraform
 
-    - name: Terraform Apply
-      run: terraform force-unlock bb954dac-4737-f05c-c182-540190add37a
+    - name: Terraforma
+      run: terraform force-unlock -auto-approve bb954dac-4737-f05c-c182-540190add37a
+      working-directory: ./codebase/terraform
+
+    - name: Terraforma
+      run: terraform force-unlock -auto-approve ed021b13-e5cd-908c-71a6-31ec4df66679
       working-directory: ./codebase/terraform
 
     - name: Terraform Workspace Select/Create
@@ -75,7 +79,7 @@ jobs:
       working-directory: ./codebase/terraform
 
     - name: Terraform Apply
-      run: terraform apply -var="website_content_directory=${{ github.workspace }}/codebase/rdicidr-0.1.0/build" -var="aws_region=us-east-1"
+      run: terraform apply -auto-approve -var="website_content_directory=${{ github.workspace }}/codebase/rdicidr-0.1.0/build" -var="aws_region=us-east-1"
       working-directory: ./codebase/terraform
       # env:
       #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
