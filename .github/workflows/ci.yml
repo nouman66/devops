@@ -70,7 +70,7 @@ jobs:
       # run: terraform init -backend-config="key=state/development/terraform.tfstate"
       # run: terraform init -backend-config="bucket=my-terraform-state-bucket" -backend-config="region=${{ secrets.AWS_REGION }}" -backend-config="dynamodb_table=my-terraform-lock-table"
       working-directory: ./codebase/terraform
-
+      
     - name: Terraform Workspace Select/Create
       run: |
         if terraform workspace list | grep -qw $WORKSPACE_NAME; then
@@ -79,7 +79,7 @@ jobs:
           terraform workspace new $WORKSPACE_NAME
         fi
       # run: |
-      #   terraform workspace select ${{ env.environment }} || terraform workspace new ${{ env.environment }}
+     # #   terraform workspace select ${{ env.environment }} || terraform workspace new ${{ env.environment }}
       working-directory: ./codebase/terraform
 
     - name: Terraform Apply
