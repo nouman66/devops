@@ -83,7 +83,7 @@ jobs:
       working-directory: ./codebase/terraform
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve -var="aws_region=${{ env.AWS_REGION }}"
+      run: terraform apply -auto-approve -var="aws_region=$AWS_REGION"
       #run: terraform apply -auto-approve -var="website_content_directory=${{ github.workspace }}/codebase/rdicidr-0.1.0/build" -var="aws_region=us-east-1"
       working-directory: ./codebase/terraform
       # env:
