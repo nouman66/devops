@@ -80,7 +80,7 @@ jobs:
 
     - name: Deploy to S3
       run: |
-        BUCKET_NAME=$(terraform output -raw bucket_name)
+        BUCKET_NAME=$(terraform output bucket_name | tr -d '"')
         echo "BUCKET_NAME=$BUCKET_NAME" >> $GITHUB_ENV
         aws s3 sync ${{ github.workspace }}/codebase/rdicidr-0.1.0/build s3://${BUCKET_NAME} --delete
       # run: aws s3 sync ${{ github.workspace }}/build s3://$(terraform output -raw bucket_name) --delete
