@@ -79,7 +79,7 @@ jobs:
           terraform workspace new $WORKSPACE_NAME
         fi
       # run: |
-     # #   terraform workspace select ${{ env.environment }} || terraform workspace new ${{ env.environment }}
+     # # #  terraform workspace select ${{ env.environment }} || terraform workspace new ${{ env.environment }}
       working-directory: ./codebase/terraform
 
     - name: Terraform Apply
