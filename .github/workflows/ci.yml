@@ -66,7 +66,7 @@ jobs:
         terraform_version: 1.0.0
 
     - name: Terraform Initialize
-      run: terraform init -backend-config="key=state/${{ env.environment }}/terraform.tfstate"
+      run: terraform init -backend-config="key=state/$WORKSPACE_NAME/terraform.tfstate"
       # run: terraform init -backend-config="key=state/development/terraform.tfstate"
       # run: terraform init -backend-config="bucket=my-terraform-state-bucket" -backend-config="region=${{ secrets.AWS_REGION }}" -backend-config="dynamodb_table=my-terraform-lock-table"
       working-directory: ./codebase/terraform
