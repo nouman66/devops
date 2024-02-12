@@ -14,8 +14,3 @@ variable "error_document" {
   description = "The error document for the S3 website"
   default     = "error.html"
 }
-
-variable "website_content_directory" {
-  type        = string
-  description = "Local directory containing website content"
-}
