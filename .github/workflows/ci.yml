@@ -7,10 +7,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: 
+      name: ${{ 
+        github.ref == 'refs/heads/main' && 'production' || 
+        github.ref == 'refs/heads/staging' && 'staging' ||
+        'development'}}
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      WORKSPACE_NAME: ${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/staging' && 'staging' || 'development' }}
+      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [15.x] # Adjusted to use Node.js version 15.x gs
 
     steps:
     - uses: actions/checkout@v3
@@ -18,8 +29,112 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+        # It's a good practice to specify the npm version if needed
+        # However, npm is typically bundled with Node.js, so specifying Node.js version should suffice
     - run: npm install
+      working-directory: ./codebase/rdicidr-0.1.0
     - run: npm run lint
+      working-directory: ./codebase/rdicidr-0.1.0
     - run: npm run prettier
+      working-directory: ./codebase/rdicidr-0.1.0
     - run: CI=true npm run test
+      working-directory: ./codebase/rdicidr-0.1.0
     - run: npm run build
+      working-directory: ./codebase/rdicidr-0.1.0
+
+  # provision-and-deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   environment: 
+  #     name: ${{ 
+  #       github.ref == 'refs/heads/main' && 'production' || 
+  #       github.ref == 'refs/heads/staging' && 'staging' ||
+  #       'development'}}
+  #   env:
+  #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #     AWS_REGION: ${{ secrets.AWS_REGION }}
+  #     WORKSPACE_NAME: ${{ github.ref == 'refs/heads/main' && 'production' || github.ref == 'refs/heads/staging' && 'staging' || 'development' }}
+  #     BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+      # TF_LOG: DEBUG
+    # steps:
+    #- uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.0
+
+    - name: Terraform Initialize
+      run: terraform init -backend-config="key=state/$WORKSPACE_NAME/terraform.tfstate"
+      # run: terraform init -backend-config="key=state/development/terraform.tfstate"
+      # run: terraform init -backend-config="bucket=my-terraform-state-bucket" -backend-config="region=${{ secrets.AWS_REGION }}" -backend-config="dynamodb_table=my-terraform-lock-table"
+      working-directory: ./codebase/terraform
+      
+    - name: Terraform Workspace Select/Create
+      run: |
+        if terraform workspace list | grep -qw $WORKSPACE_NAME; then
+          terraform workspace select $WORKSPACE_NAME
+        else
+          terraform workspace new $WORKSPACE_NAME
+        fi
+      # run: |
+     # # #  terraform workspace select ${{ env.environment }} || terraform workspace new ${{ env.environment }}
+      working-directory: ./codebase/terraform
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve -var="aws_region=$AWS_REGION"
+      #run: terraform apply -auto-approve -var="website_content_directory=${{ github.workspace }}/codebase/rdicidr-0.1.0/build" -var="aws_region=us-east-1"
+      working-directory: ./codebase/terraform
+      # env:
+      #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #   AWS_REGION: ${{ secrets.AWS_REGION }}
+
+    # - name: Set Bucket Name
+    #   id: set_bucket_name
+    #   run: |
+    #     echo "BUCKET_NAME=$(terraform output -raw bucket_name)" >> $GITHUB_ENV
+
+    - name: Deploy to S3
+      run: aws s3 sync ${{ github.workspace }}/codebase/rdicidr-0.1.0/build s3://${{ env.BUCKET_NAME }} --delete
+      # run: aws s3 sync ${{ github.workspace }}/build s3://$(terraform output -raw bucket_name) --delete
+      working-directory: ./codebase/terraform
+      # env:
+      #   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #   AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
+
+#test
+
+# name: Node.js CI
+
+# on:
+#   pull_request:
+#     branches: [ main ]
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     strategy:
+#       matrix:
+#         node-version: [16.x]
+# #test
+#     steps:
+#     - uses: actions/checkout@v3
+#     - name: Use Node.js ${{ matrix.node-version }}
+#       uses: actions/setup-node@v3
+#       with:
+#         node-version: ${{ matrix.node-version }}
+#     - run: npm install
+#       working-directory: ./codebase/rdicidr-0.1.0
+#     - run: npm run lint
+#     - run: npm run prettier
+#     - run: CI=true npm run test
+#     - run: npm run build
+
+#     - name: Use Node.js 15.x
+#     uses: actions/setup-node@v3
+#     with:
+#       node-version: '15.x'
