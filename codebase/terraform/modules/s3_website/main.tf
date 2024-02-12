@@ -55,11 +55,3 @@ resource "aws_s3_bucket_website_configuration" "website" {
     key = var.error_document
   }
 }
-
-resource "aws_s3_object" "website_files" {
-  for_each = fileset(var.website_content_directory, "**/*")
-  bucket   = aws_s3_bucket.bucket.id
-  key      = each.value
-  source   = "${var.website_content_directory}/${each.value}"
-  etag     = filemd5("${var.website_content_directory}/${each.value}")
-}

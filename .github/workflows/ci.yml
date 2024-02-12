@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [15.x] # Adjusted to use Node.js version 15.x g
+        node-version: [15.x] # Adjusted to use Node.js version 15.x gs
 
     steps:
     - uses: actions/checkout@v3
